@@ -18,39 +18,42 @@ jobs:
       fail-fast: false
       matrix:
         include:
-        - name: static
+        - name: Linux Static
           file: Dockerfile.static
-          tag: static
-        - name: dynamic
+          tag: 5.15.9-static
+          build-args: |
+            QT_VERSION=5.15.9
+
+        - name: Linux Dynamic
           file: Dockerfile
-          tag: latest
-        - name: MXE
+          tag: 6-dynamic
+
+        - name: MXE Win32 Static
           file: Dockerfile.mxe
-          tag: mxe
+          tag: 6-static-win32
+          build-args: |
+            MXE_ARCH=i686
+            MXE_BUILD=static
+        - name: MXE Win32 Dynamic
+          file: Dockerfile.mxe
+          tag: 6-dynamic-win32
+          build-args: |
+            MXE_ARCH=i686
+            MXE_BUILD=shared
+
+        - name: MXE Win64 Static
+          file: Dockerfile.mxe
+          tag: 6-static-win64
+          build-args: |
+            MXE_ARCH=x86_64
+            MXE_BUILD=static
+        - name: MXE Win64 Dynamic
+          file: Dockerfile.mxe
+          tag: 6-dynamic-win64
+          build-args: |
+            MXE_ARCH=x86_64
+            MXE_BUILD=shared
     name: ${{ matrix.name }}
-    uses: ./.github/workflows/build.yaml
-    with:
-      file: ${{ matrix.file }}
-      tag: ${{ matrix.tag }}
-  mxe_win:
-    needs: [build]
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-        - name: Win32 Static
-          file: Dockerfile.win32s
-          tag: win32s
-        - name: Win32 Dynamic
-          file: Dockerfile.win32d
-          tag: win32d
-        - name: Win64 Static
-          file: Dockerfile.win64s
-          tag: win64s
-        - name: Win64 Dynamic
-          file: Dockerfile.win64d
-          tag: win64d
-    name: MXE ${{ matrix.name }}
     uses: ./.github/workflows/build.yaml
     with:
       file: ${{ matrix.file }}

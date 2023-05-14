@@ -1,6 +1,0 @@
-FROM fffaraz/qt:mxe
-
-RUN \
-    cd /opt/mxe && \
-    make --jobs=$(nproc) JOBS=$(nproc) MXE_TARGETS='i686-w64-mingw32.static' qt6-qtbase && \
-    exit 0
