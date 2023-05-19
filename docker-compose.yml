@@ -3,7 +3,7 @@ version: "3.6"
 services:
   worker:
     build: .
-    image: fffaraz/qt:latest
+    image: ghcr.io/duhow/qt:latest
     restart: always
     hostname: worker
     privileged: true
