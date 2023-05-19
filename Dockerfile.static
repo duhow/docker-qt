@@ -1,5 +1,14 @@
-FROM ubuntu:22.04
+# syntax=docker/dockerfile:1.4
 
+FROM ubuntu:22.04 AS download
+ARG QT_VERSION=5.15.9
+
+RUN apt update && \
+    apt install -y wget ca-certificates && \
+    wget -q -O /qt.tar.xz \
+      https://download.qt.io/official_releases/qt/${QT_VERSION%.*}/${QT_VERSION}/single/qt-everywhere-opensource-src-${QT_VERSION}.tar.xz
+
+FROM ubuntu:22.04
 ARG QT_VERSION=5.15.9
 
 RUN \
@@ -23,12 +32,10 @@ RUN \
     rm -rf /var/lib/apt/lists/* && \
     exit 0
 
-RUN \
+RUN --mount=type=bind,from=download,source=/qt.tar.xz,target=/qt.tar.xz
     set -eux && \
     cd /opt && \
-    wget -q -O qt.tar.xz https://download.qt.io/official_releases/qt/${QT_VERSION%.*}/${QT_VERSION}/single/qt-everywhere-opensource-src-${QT_VERSION}.tar.xz && \
-    tar xf qt.tar.xz && \
-    rm qt.tar.xz && \
+    tar xf /qt.tar.xz && \
     cd /opt/qt-everywhere-src-* && \
     ./configure -opensource -confirm-license -release -static \
       -nomake tests \
@@ -42,7 +49,7 @@ RUN \
       -qt-harfbuzz \
       -fontconfig \
       -xcb && \
-    make -j $(nproc) && \
+    make -j$(nproc) && \
     make install && \
     cd /opt && \
     rm -rf qt-everywhere-src-*
